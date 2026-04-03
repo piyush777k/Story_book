@@ -1,0 +1,1234 @@
+/* ==========================================
+   A Story I Didn't Plan — Book Website
+   ========================================== */
+
+/* ---------- Reset & Base ---------- */
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --page-width: min(960px, 94vw);
+    --page-height: min(680px, 92vh);
+    --page-color: #fdf6ec;
+    --page-color-alt: #faf0de;
+    --text-color: #3a2e28;
+    --text-muted: #7a6b62;
+    --accent: #c47a5a;
+    --accent-warm: #d4956b;
+    --cover-bg: #2c1810;
+    --cover-accent: #d4a574;
+    --gold: #c9a96e;
+    --gold-light: #e8d5a3;
+    --shadow-color: rgba(44, 24, 16, 0.3);
+    --turn-duration: 0.8s;
+}
+
+html {
+    font-size: 16px;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #1a0f0a 0%, #2c1810 30%, #1a0f0a 60%, #0d0705 100%);
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    color: var(--text-color);
+    overflow: hidden;
+    position: relative;
+    clip-path: inset(0);
+}
+
+/* ---------- Music Toggle Button ---------- */
+.music-toggle {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(44, 24, 16, 0.85);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    padding: 10px 18px;
+    border-radius: 50px;
+    cursor: pointer;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.music-toggle:hover {
+    background: rgba(201, 169, 110, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(201, 169, 110, 0.3);
+}
+
+.music-toggle.playing {
+    border-color: var(--accent-warm);
+    color: var(--accent-warm);
+    animation: musicPulse 2s ease-in-out infinite;
+}
+
+.music-icon {
+    font-size: 1.2rem;
+    display: inline-block;
+}
+
+.music-toggle.playing .music-icon {
+    animation: musicBounce 1s ease-in-out infinite;
+}
+
+@keyframes musicPulse {
+    0%, 100% { box-shadow: 0 4px 20px rgba(212, 149, 107, 0.2); }
+    50% { box-shadow: 0 4px 30px rgba(212, 149, 107, 0.5); }
+}
+
+@keyframes musicBounce {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+}
+
+/* ---------- Ambient Particles ---------- */
+.ambient-particles {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+}
+
+.ambient-particle {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: var(--gold);
+    opacity: 0;
+    animation: floatParticle 8s ease-in-out infinite;
+}
+
+@keyframes floatParticle {
+    0% { opacity: 0; transform: translateY(100vh) scale(0); }
+    20% { opacity: 0.6; }
+    80% { opacity: 0.3; }
+    100% { opacity: 0; transform: translateY(-20vh) scale(1); }
+}
+
+/* ---------- Book Scene ---------- */
+.book-scene {
+    perspective: 1800px;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--page-width);
+    height: var(--page-height);
+    overflow: hidden;
+}
+
+.book {
+    width: var(--page-width);
+    height: var(--page-height);
+    position: relative;
+    transform-style: preserve-3d;
+    /* Book spine shadow */
+    box-shadow:
+        -5px 5px 20px rgba(0, 0, 0, 0.4),
+        0 0 60px rgba(0, 0, 0, 0.2);
+    border-radius: 0 8px 8px 0;
+}
+
+/* ---------- Page Base ---------- */
+.page {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    transform-origin: left center;
+    transform-style: preserve-3d;
+    transition: transform var(--turn-duration) cubic-bezier(0.645, 0.045, 0.355, 1.000);
+    cursor: default;
+    z-index: 1;
+}
+
+.page.turned {
+    transform: rotateY(-180deg);
+}
+
+.page-front, .page-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 0 8px 8px 0;
+    overflow: hidden;
+}
+
+.page-front {
+    z-index: 2;
+}
+
+.page-back {
+    z-index: 1;
+    transform: rotateY(180deg);
+    display: none;
+}
+
+
+.page-texture {
+    position: absolute;
+    inset: 0;
+    background:
+        repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.01) 2px,
+            rgba(0, 0, 0, 0.01) 4px
+        );
+    pointer-events: none;
+}
+
+
+
+/* ---------- Page Stacking (z-index) ---------- */
+#page-1 { z-index: 7; }
+#page-2 { z-index: 6; }
+#page-3 { z-index: 5; }
+#page-4 { z-index: 4; }
+#page-5 { z-index: 3; }
+#page-6 { z-index: 2; }
+#page-7 { z-index: 1; }
+
+/* When turned, reverse z-order for proper stacking */
+.page.turned { z-index: 100 !important; }
+#page-1.turned { z-index: 101 !important; }
+#page-2.turned { z-index: 102 !important; }
+#page-3.turned { z-index: 103 !important; }
+#page-4.turned { z-index: 104 !important; }
+#page-5.turned { z-index: 105 !important; }
+#page-6.turned { z-index: 106 !important; }
+#page-7.turned { z-index: 107 !important; }
+
+/* ---------- Cover Page ---------- */
+.cover-page {
+    background: linear-gradient(160deg, #3d2117 0%, #2c1810 40%, #1a0f0a 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 30px;
+    position: relative;
+    border: 3px solid var(--gold);
+    border-left: none;
+    border-radius: 0 8px 8px 0;
+    overflow: hidden;
+}
+
+.cover-photo {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+    opacity: 0.35;
+    filter: blur(1px);
+}
+
+.cover-photo-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(160deg, rgba(61, 33, 23, 0.75) 0%, rgba(44, 24, 16, 0.85) 40%, rgba(26, 15, 10, 0.9) 100%);
+    z-index: 1;
+}
+
+.cover-page .cover-ornament,
+.cover-page .cover-content,
+.cover-page .next-btn {
+    position: relative;
+    z-index: 2;
+}
+
+.cover-page::before {
+    content: '';
+    position: absolute;
+    inset: 12px;
+    border: 1px solid rgba(201, 169, 110, 0.3);
+    border-radius: 4px;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.cover-page::after {
+    content: '';
+    position: absolute;
+    inset: 20px;
+    border: 1px solid rgba(201, 169, 110, 0.15);
+    border-radius: 2px;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.cover-ornament {
+    color: var(--gold);
+    font-size: 1.2rem;
+    letter-spacing: 16px;
+    opacity: 0.7;
+}
+
+.top-ornament {
+    margin-bottom: auto;
+    padding-top: 20px;
+}
+
+.bottom-ornament {
+    margin-top: auto;
+    padding-bottom: 20px;
+}
+
+.cover-content {
+    text-align: center;
+}
+
+.cover-icon {
+    font-size: 3rem;
+    margin-bottom: 24px;
+    animation: gentleFloat 3s ease-in-out infinite;
+}
+
+@keyframes gentleFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+
+.cover-title {
+    font-family: 'Cormorant Garamond', 'Georgia', serif;
+    font-size: 2.6rem;
+    font-weight: 300;
+    color: var(--gold-light);
+    line-height: 1.3;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+    text-shadow: 0 2px 10px rgba(201, 169, 110, 0.3);
+}
+
+.cover-divider {
+    width: 80px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    margin: 0 auto 20px;
+}
+
+.cover-author {
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.15rem;
+    color: var(--cover-accent);
+    line-height: 1.7;
+    opacity: 0.85;
+}
+
+/* ---------- Chapter Pages ---------- */
+.chapter-page {
+    background: var(--page-color);
+    display: flex;
+    flex-direction: column;
+    padding: 28px 34px 20px;
+    position: relative;
+}
+
+/* Paper texture overlay */
+.chapter-page::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    border-radius: 0 8px 8px 0;
+}
+
+/* Subtle page fold shadow on left */
+.chapter-page::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 30px;
+    background: linear-gradient(90deg, rgba(0,0,0,0.06), transparent);
+    pointer-events: none;
+}
+
+.page-header {
+    text-align: center;
+    margin-bottom: 14px;
+    position: relative;
+}
+
+.page-header::after {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    margin: 6px auto 0;
+}
+
+.chapter-number {
+    display: block;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: var(--accent);
+    margin-bottom: 4px;
+}
+
+.chapter-title {
+    display: block;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: var(--text-color);
+    letter-spacing: 1px;
+}
+
+.page-body {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    overflow: hidden;
+    min-height: 0;
+}
+
+.page-body p {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--text-color);
+    text-align: left;
+    flex-shrink: 1;
+}
+
+/* ---------- Page Text Container ---------- */
+.page-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 8px;
+    min-width: 0;
+    overflow-y: auto;
+}
+
+/* ---------- Page Photos ---------- */
+.page-photo-container {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    border-radius: 10px;
+    align-self: stretch;
+    max-width: 50%;
+}
+
+.page-photo-container .page-photo {
+    width: auto;
+    height: auto;
+    max-height: 100%;
+    max-width: 100%;
+    object-fit: contain;
+    border-radius: 10px;
+    border: 2px solid rgba(196, 122, 90, 0.25);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    display: block;
+}
+
+.dual-photo {
+    flex-direction: column;
+}
+
+.dual-photo .page-photo {
+    width: 100%;
+    height: 48%;
+    object-fit: cover;
+}
+
+.page-body em {
+    color: var(--accent);
+    font-style: italic;
+}
+
+.page-body .emphasis {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.page-body .whisper {
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.15rem;
+    color: var(--text-muted);
+    text-align: center;
+    margin-top: 6px;
+    opacity: 0.85;
+}
+
+.page-footer {
+    text-align: center;
+    padding-top: 6px;
+}
+
+.page-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    letter-spacing: 2px;
+}
+
+/* ---------- Page Turn Buttons ---------- */
+.page-turn-btn {
+    position: absolute;
+    bottom: 24px;
+    background: none;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1rem;
+    padding: 8px 20px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    letter-spacing: 1px;
+    z-index: 10;
+}
+
+.page-turn-btn:hover {
+    background: var(--accent);
+    color: #fff;
+    transform: scale(1.05);
+    box-shadow: 0 4px 15px rgba(196, 122, 90, 0.3);
+}
+
+.next-btn {
+    right: 24px;
+}
+
+.prev-btn {
+    left: 24px;
+}
+
+
+
+/* Cover open button */
+.cover-page .next-btn {
+    border-color: var(--gold);
+    color: var(--gold);
+    font-size: 0.95rem;
+    padding: 10px 28px;
+    bottom: 40px;
+}
+
+.cover-page .next-btn:hover {
+    background: var(--gold);
+    color: var(--cover-bg);
+    box-shadow: 0 4px 20px rgba(201, 169, 110, 0.4);
+}
+
+/* ---------- Final Chapter ---------- */
+.final-chapter .page-body {
+    gap: 12px;
+}
+
+.the-question {
+    font-family: 'Cormorant Garamond', serif !important;
+    font-size: 1.6rem !important;
+    font-weight: 600 !important;
+    color: var(--accent) !important;
+    text-align: center !important;
+    margin-top: 12px;
+    padding: 16px 0;
+    border-top: 1px solid rgba(196, 122, 90, 0.2);
+    border-bottom: 1px solid rgba(196, 122, 90, 0.2);
+}
+
+.answer-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 12px;
+    align-items: center;
+}
+
+.answer-btn {
+    width: 220px;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    letter-spacing: 0.5px;
+    position: relative;
+    overflow: hidden;
+}
+
+.answer-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.answer-btn:hover::before {
+    opacity: 1;
+}
+
+.yes-btn {
+    background: linear-gradient(135deg, #e07a8e, #c94d6b);
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(201, 77, 107, 0.3);
+}
+
+.yes-btn:hover {
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: 0 8px 25px rgba(201, 77, 107, 0.4);
+}
+
+.time-btn {
+    background: linear-gradient(135deg, #d4a574, #c49060);
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(196, 144, 96, 0.3);
+}
+
+.time-btn:hover {
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: 0 8px 25px rgba(196, 144, 96, 0.4);
+}
+
+.no-btn {
+    background: linear-gradient(135deg, #9a8a7a, #7a6b5e);
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(122, 107, 94, 0.3);
+}
+
+.no-btn:hover {
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: 0 8px 25px rgba(122, 107, 94, 0.4);
+}
+
+/* ---------- Ending Overlays ---------- */
+.ending-overlay {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.6s ease;
+}
+
+.ending-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.ending-content {
+    text-align: center;
+    padding: 60px 50px;
+    border-radius: 20px;
+    max-width: 480px;
+    position: relative;
+    transform: scale(0.8) translateY(30px);
+    transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.ending-overlay.active .ending-content {
+    transform: scale(1) translateY(0);
+}
+
+.ending-yes {
+    background: linear-gradient(160deg, rgba(255, 220, 230, 0.97), rgba(255, 200, 215, 0.97));
+    box-shadow: 0 20px 60px rgba(201, 77, 107, 0.3), inset 0 1px 0 rgba(255,255,255,0.5);
+    backdrop-filter: blur(20px);
+}
+
+.ending-time {
+    background: linear-gradient(160deg, rgba(255, 240, 220, 0.97), rgba(255, 225, 195, 0.97));
+    box-shadow: 0 20px 60px rgba(196, 144, 96, 0.3), inset 0 1px 0 rgba(255,255,255,0.5);
+    backdrop-filter: blur(20px);
+}
+
+.ending-no {
+    background: linear-gradient(160deg, rgba(240, 235, 230, 0.97), rgba(225, 218, 210, 0.97));
+    box-shadow: 0 20px 60px rgba(122, 107, 94, 0.3), inset 0 1px 0 rgba(255,255,255,0.5);
+    backdrop-filter: blur(20px);
+}
+
+.ending-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    animation: gentleFloat 2.5s ease-in-out infinite;
+}
+
+.ending-content h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2rem;
+    font-weight: 500;
+    color: var(--text-color);
+    margin-bottom: 16px;
+    letter-spacing: 1px;
+}
+
+.ending-text {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: var(--text-color);
+    opacity: 0.9;
+}
+
+.ending-text em {
+    color: var(--accent);
+    font-weight: 600;
+}
+
+.back-btn {
+    margin-top: 30px;
+    background: none;
+    border: 1px solid var(--text-muted);
+    color: var(--text-muted);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.9rem;
+    padding: 8px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    letter-spacing: 1px;
+}
+
+.back-btn:hover {
+    background: var(--text-muted);
+    color: #fff;
+}
+
+/* ---------- Overlay backgrounds ---------- */
+#endingYes {
+    background: radial-gradient(circle, rgba(255, 182, 193, 0.4), rgba(44, 24, 16, 0.85));
+}
+
+#endingTime {
+    background: radial-gradient(circle, rgba(255, 220, 180, 0.4), rgba(44, 24, 16, 0.85));
+}
+
+#endingNo {
+    background: radial-gradient(circle, rgba(200, 190, 180, 0.4), rgba(44, 24, 16, 0.85));
+}
+
+/* ---------- Hearts Rain (Yes ending) ---------- */
+.hearts-rain {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    border-radius: 20px;
+}
+
+.falling-heart {
+    position: absolute;
+    top: -30px;
+    font-size: 1.2rem;
+    animation: heartFall 4s ease-in infinite;
+    opacity: 0.7;
+}
+
+@keyframes heartFall {
+    0% {
+        transform: translateY(-30px) rotate(0deg);
+        opacity: 0.7;
+    }
+    100% {
+        transform: translateY(500px) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+/* ---------- Page turn shadow effect ---------- */
+.page.turning-next {
+    animation: pageShadowNext var(--turn-duration) ease;
+}
+
+.page.turning-prev {
+    animation: pageShadowPrev var(--turn-duration) ease;
+}
+
+@keyframes pageShadowNext {
+    0% { filter: brightness(1); }
+    50% { filter: brightness(0.92); }
+    100% { filter: brightness(1); }
+}
+
+@keyframes pageShadowPrev {
+    0% { filter: brightness(1); }
+    50% { filter: brightness(0.92); }
+    100% { filter: brightness(1); }
+}
+
+/* ---------- Ending particles ---------- */
+.ending-particles {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    border-radius: 20px;
+}
+
+.sparkle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: rgba(255, 182, 193, 0.8);
+    animation: sparkleAnim 2s ease-in-out infinite;
+}
+
+@keyframes sparkleAnim {
+    0%, 100% { opacity: 0; transform: scale(0); }
+    50% { opacity: 1; transform: scale(1); }
+}
+
+/* ---------- Responsive: Tablets & Small Desktops ---------- */
+@media (max-width: 1024px) {
+    :root {
+        --page-width: 96vw;
+        --page-height: 90vh;
+    }
+}
+
+/* ---------- Responsive: Mobile Devices ---------- */
+@media (max-width: 780px) {
+    :root {
+        --page-width: 100vw;
+        --page-height: 100vh;
+        --page-height: 100dvh; /* Use dynamic viewport height for mobile browsers */
+    }
+
+    html {
+        font-size: 15px;
+    }
+
+    body {
+        align-items: flex-start;
+        overflow: hidden;
+    }
+
+    /* Make book fill the entire mobile screen */
+    .book-scene {
+        width: 100vw;
+        height: 100vh;
+        height: 100dvh;
+        perspective: 1200px;
+        border-radius: 0;
+    }
+
+    .book {
+        width: 100%;
+        height: 100%;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    .page-front, .page-back {
+        border-radius: 0;
+    }
+
+    /* ---- Cover Page (Mobile) ---- */
+    .cover-page {
+        padding: 30px 20px;
+        border-radius: 0;
+        border: none;
+        border-right: none;
+    }
+
+    .cover-page::before {
+        inset: 8px;
+    }
+
+    .cover-page::after {
+        inset: 14px;
+    }
+
+    .cover-title {
+        font-size: 2rem;
+        letter-spacing: 1px;
+    }
+
+    .cover-author {
+        font-size: 1rem;
+    }
+
+    .cover-ornament {
+        font-size: 1rem;
+        letter-spacing: 10px;
+    }
+
+    .top-ornament {
+        padding-top: 14px;
+    }
+
+    .bottom-ornament {
+        padding-bottom: 14px;
+    }
+
+    .cover-page .next-btn {
+        bottom: 28px;
+        font-size: 0.85rem;
+        padding: 8px 22px;
+    }
+
+    /* ---- Chapter Pages (Mobile) ---- */
+    .chapter-page {
+        padding: 16px 16px 14px;
+        border-radius: 0;
+    }
+
+    .chapter-page::before {
+        border-radius: 0;
+    }
+
+    .page-header {
+        margin-bottom: 10px;
+    }
+
+    .chapter-number {
+        font-size: 0.7rem;
+        letter-spacing: 2px;
+        margin-bottom: 2px;
+    }
+
+    .chapter-title {
+        font-size: 1.2rem;
+    }
+
+    /* Photos on the left, text on the right — even on mobile */
+    .page-body {
+        flex-direction: row;
+        gap: 12px;
+        overflow: hidden;
+    }
+
+    .page-photo-container {
+        max-width: 40%;
+        flex-shrink: 0;
+        align-self: stretch;
+    }
+
+    .page-photo-container .page-photo {
+        width: auto;
+        height: auto;
+        max-height: 100%;
+        max-width: 100%;
+        object-fit: contain;
+        border-radius: 8px;
+        display: block;
+    }
+
+    .dual-photo .page-photo {
+        height: 48%;
+    }
+
+    .page-text {
+        flex: 1;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        gap: 6px;
+        padding-bottom: 8px;
+    }
+
+    .page-body p {
+        font-size: 0.88rem;
+        line-height: 1.5;
+    }
+
+    .page-body .whisper {
+        font-size: 0.95rem;
+        margin-top: 4px;
+    }
+
+    .page-body .emphasis {
+        font-size: 1rem;
+    }
+
+    .page-body em {
+        font-size: inherit;
+    }
+
+    /* ---- Page Footer & Buttons (Mobile) ---- */
+    .page-footer {
+        padding-top: 4px;
+    }
+
+    .page-num {
+        font-size: 0.75rem;
+    }
+
+    .page-turn-btn {
+        bottom: 14px;
+        font-size: 0.88rem;
+        padding: 6px 16px;
+    }
+
+    .next-btn {
+        right: 14px;
+    }
+
+    .prev-btn {
+        left: 14px;
+    }
+
+    /* ---- Final Chapter (Mobile) ---- */
+    .final-chapter .page-body {
+        flex-direction: column;
+        gap: 6px;
+        justify-content: center;
+        align-items: center;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .final-chapter .page-body p {
+        font-size: 0.82rem;
+        line-height: 1.45;
+        text-align: center;
+    }
+
+    .the-question {
+        font-size: 1.1rem !important;
+        padding: 8px 0;
+        margin-top: 4px;
+    }
+
+    .answer-buttons {
+        gap: 6px;
+        margin-top: 6px;
+    }
+
+    .answer-btn {
+        width: 170px;
+        padding: 8px 14px;
+        font-size: 0.82rem;
+    }
+
+    /* ---- Music Toggle (Mobile) ---- */
+    .music-toggle {
+        bottom: 12px;
+        right: 12px;
+        padding: 7px 12px;
+        font-size: 0.75rem;
+        gap: 5px;
+    }
+
+    .music-icon {
+        font-size: 1rem;
+    }
+
+    /* ---- Ending Overlays (Mobile) ---- */
+    .ending-content {
+        padding: 36px 24px;
+        margin: 0 12px;
+        border-radius: 16px;
+        max-width: 92vw;
+    }
+
+    .ending-icon {
+        font-size: 3rem;
+        margin-bottom: 14px;
+    }
+
+    .ending-content h2 {
+        font-size: 1.6rem;
+        margin-bottom: 12px;
+    }
+
+    .ending-text {
+        font-size: 0.95rem;
+        line-height: 1.7;
+    }
+
+    .back-btn {
+        margin-top: 22px;
+        font-size: 0.85rem;
+        padding: 7px 16px;
+    }
+}
+
+/* ---------- Responsive: Very Small Phones (≤400px) ---------- */
+@media (max-width: 400px) {
+    html {
+        font-size: 14px;
+    }
+
+    .chapter-page {
+        padding: 12px 12px 12px;
+    }
+
+    .cover-title {
+        font-size: 1.7rem;
+    }
+
+    .cover-author {
+        font-size: 0.9rem;
+    }
+
+    .chapter-title {
+        font-size: 1.1rem;
+    }
+
+    .page-body p {
+        font-size: 0.82rem;
+        line-height: 1.45;
+    }
+
+    .page-photo-container {
+        max-height: 30vh;
+    }
+
+    .the-question {
+        font-size: 1.1rem !important;
+    }
+
+    .answer-btn {
+        width: 170px;
+        padding: 8px 14px;
+        font-size: 0.8rem;
+    }
+
+    .page-turn-btn {
+        bottom: 10px;
+        font-size: 0.8rem;
+        padding: 5px 12px;
+    }
+
+    .ending-content {
+        padding: 28px 18px;
+    }
+
+    .ending-content h2 {
+        font-size: 1.4rem;
+    }
+}
+
+/* ---------- Responsive: Short Screens / Landscape Mobile ---------- */
+@media (max-height: 600px) {
+    :root {
+        --page-height: 100vh;
+        --page-height: 100dvh;
+    }
+
+    .chapter-page {
+        padding: 10px 16px 10px;
+    }
+
+    .page-header {
+        margin-bottom: 6px;
+    }
+
+    .page-body {
+        flex-direction: row;
+        gap: 14px;
+    }
+
+    .page-photo-container {
+        width: 35%;
+        max-height: none;
+    }
+
+    .page-body p {
+        font-size: 0.85rem;
+        line-height: 1.4;
+    }
+
+    .page-body .whisper {
+        font-size: 0.9rem;
+    }
+
+    .cover-title {
+        font-size: 1.8rem;
+    }
+
+    .cover-icon {
+        font-size: 2rem;
+        margin-bottom: 12px;
+    }
+
+    .cover-ornament {
+        font-size: 0.9rem;
+    }
+
+    .top-ornament {
+        padding-top: 8px;
+    }
+
+    .bottom-ornament {
+        padding-bottom: 8px;
+    }
+
+    .the-question {
+        font-size: 1.2rem !important;
+        padding: 8px 0;
+        margin-top: 4px;
+    }
+
+    .answer-buttons {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 6px;
+        margin-top: 6px;
+    }
+
+    .answer-btn {
+        width: auto;
+        padding: 8px 16px;
+        font-size: 0.8rem;
+    }
+
+    .page-turn-btn {
+        bottom: 8px;
+    }
+}
+
+/* ---------- Landscape Mobile (short + narrow) ---------- */
+@media (max-height: 500px) and (max-width: 900px) {
+    .page-photo-container {
+        width: 30%;
+    }
+
+    .chapter-page {
+        padding: 8px 12px 8px;
+    }
+
+    .page-body p {
+        font-size: 0.78rem;
+        line-height: 1.35;
+    }
+
+    .cover-title {
+        font-size: 1.5rem;
+    }
+}

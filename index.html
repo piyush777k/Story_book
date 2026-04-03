@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A Story I Didn't Plan — an interactive book experience with page-turning animations.">
+    <title>📖 A Story I Didn't Plan</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Inter:wght@300;400;500;600&family=Dancing+Script:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Background Music -->
+    <audio id="bgMusic" loop preload="auto">
+        <source src="bgm.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Music Toggle Button -->
+    <button class="music-toggle" id="musicToggle" aria-label="Toggle music">
+        <span class="music-icon" id="musicIcon">🎵</span>
+        <span class="music-label" id="musicLabel">Play</span>
+    </button>
+
+    <!-- Ambient particles -->
+    <div class="ambient-particles" id="ambientParticles"></div>
+
+    <!-- Book container -->
+    <div class="book-scene">
+        <div class="book" id="book">
+
+            <!-- Page 1: Cover -->
+            <div class="page" id="page-1">
+                <div class="page-front cover-page">
+                    <img src="cover-page.jpg" alt="Cover" class="cover-photo">
+                    <div class="cover-photo-overlay"></div>
+                    <div class="cover-ornament top-ornament">✦ ✦ ✦</div>
+                    <div class="cover-content">
+                        <h1 class="cover-title">A Story<br>I Didn't Plan</h1>
+                        <div class="cover-divider"></div>
+                        <p class="cover-author">by someone who just…<br>couldn't ignore it anymore</p>
+                    </div>
+                    <div class="cover-ornament bottom-ornament">✦ ✦ ✦</div>
+                    <button class="page-turn-btn next-btn" onclick="turnPage(1, 'next')" aria-label="Next page">
+                        <span>Open Book →</span>
+                    </button>
+                </div>
+                <div class="page-back"></div>
+            </div>
+
+            <!-- Page 2: Chapter 1 -->
+            <div class="page" id="page-2">
+                <div class="page-front chapter-page">
+                    <div class="page-header">
+                        <span class="chapter-number">Chapter 1</span>
+                        <span class="chapter-title">The First Chapter</span>
+                    </div>
+                    <div class="page-body">
+                        <div class="page-photo-container">
+                            <img src="page-1.jpg" alt="Page 1" class="page-photo">
+                        </div>
+                        <div class="page-text">
+                            <p>I don't remember the exact moment it started.</p>
+                            <p>There wasn't some dramatic scene or perfect timing.</p>
+                            <p>But somewhere between normal days and random conversations…<br>
+                            <em>you became someone I started noticing a little more than everyone else.</em></p>
+                            <p>At first, it was nothing serious.<br>
+                            Just another person… just another conversation.</p>
+                            <p class="whisper">Or at least, that's what I told myself.</p>
+                        </div>
+                    </div>
+                    <div class="page-footer">
+                        <span class="page-num">1</span>
+                    </div>
+                    <button class="page-turn-btn prev-btn" onclick="goPrev()" aria-label="Previous page">←</button>
+                    <button class="page-turn-btn next-btn" onclick="turnPage(2, 'next')" aria-label="Next page">→</button>
+                </div>
+                <div class="page-back"></div>
+            </div>
+
+            <!-- Page 3: Chapter 2 -->
+            <div class="page" id="page-3">
+                <div class="page-front chapter-page">
+                    <div class="page-header">
+                        <span class="chapter-number">Chapter 2</span>
+                        <span class="chapter-title">The Unexpected Plot Twist</span>
+                    </div>
+                    <div class="page-body">
+                        <div class="page-photo-container">
+                            <img src="page-2.jpg" alt="Page 2" class="page-photo">
+                        </div>
+                        <div class="page-text">
+                            <p>Slowly, things changed.</p>
+                            <p>It wasn't something big —<br>
+                            just small moments… random thoughts…<br>
+                            finding reasons to check my phone a bit more often.</p>
+                            <p>And without even realizing it,<br>
+                            <em>you became part of my daily routine.</em></p>
+                            <p>Not in a loud way.<br>
+                            Not in a dramatic way.</p>
+                            <p class="whisper">Just quietly… but constantly.</p>
+                        </div>
+                    </div>
+                    <div class="page-footer">
+                        <span class="page-num">2</span>
+                    </div>
+                    <button class="page-turn-btn prev-btn" onclick="goPrev()" aria-label="Previous page">←</button>
+                    <button class="page-turn-btn next-btn" onclick="turnPage(3, 'next')" aria-label="Next page">→</button>
+                </div>
+                <div class="page-back"></div>
+            </div>
+
+            <!-- Page 4: Chapter 3 -->
+            <div class="page" id="page-4">
+                <div class="page-front chapter-page">
+                    <div class="page-header">
+                        <span class="chapter-number">Chapter 3</span>
+                        <span class="chapter-title">The Chaos You Created</span>
+                    </div>
+                    <div class="page-body">
+                        <div class="page-photo-container dual-photo">
+                            <img src="page-3.jpg" alt="Page 3" class="page-photo">
+                            <img src="page-3-1.jpg" alt="Page 3" class="page-photo">
+                        </div>
+                        <div class="page-text">
+                            <p>I won't lie… you made things a little chaotic for me.</p>
+                            <p>Suddenly, I was overthinking simple things.<br>
+                            Smiling at random messages.<br>
+                            Replaying conversations for no reason.</p>
+                            <p>And yeah… sometimes messing things up too.</p>
+                            <p>But one thing was always real —<br>
+                            <em class="emphasis">how I felt.</em></p>
+                        </div>
+                    </div>
+                    <div class="page-footer">
+                        <span class="page-num">3</span>
+                    </div>
+                    <button class="page-turn-btn prev-btn" onclick="goPrev()" aria-label="Previous page">←</button>
+                    <button class="page-turn-btn next-btn" onclick="turnPage(4, 'next')" aria-label="Next page">→</button>
+                </div>
+                <div class="page-back"></div>
+            </div>
+
+            <!-- Page 5: Chapter 4 -->
+            <div class="page" id="page-5">
+                <div class="page-front chapter-page">
+                    <div class="page-header">
+                        <span class="chapter-number">Chapter 4</span>
+                        <span class="chapter-title">Things I Never Said</span>
+                    </div>
+                    <div class="page-body">
+                        <p>There were a lot of things I never said properly.</p>
+                        <p>Not because I didn't feel them…<br>
+                        but because I didn't know how to.</p>
+                        <p>And maybe when I finally tried…<br>
+                        <em>it didn't come out the way it should have.</em></p>
+                        <p>If I made things uncomfortable or confusing,<br>
+                        I'm genuinely sorry.</p>
+                        <p>That was never my intention.</p>
+                        <p class="whisper">I just… didn't want to hide it anymore.</p>
+                    </div>
+                    <div class="page-footer">
+                        <span class="page-num">4</span>
+                    </div>
+                    <button class="page-turn-btn prev-btn" onclick="goPrev()" aria-label="Previous page">←</button>
+                    <button class="page-turn-btn next-btn" onclick="turnPage(5, 'next')" aria-label="Next page">→</button>
+                </div>
+                <div class="page-back"></div>
+            </div>
+
+            <!-- Page 6: Chapter 5 -->
+            <div class="page" id="page-6">
+                <div class="page-front chapter-page">
+                    <div class="page-header">
+                        <span class="chapter-number">Chapter 5</span>
+                        <span class="chapter-title">If This Was a Story</span>
+                    </div>
+                    <div class="page-body">
+                        <p>If this was just a story,<br>
+                        I'd probably write it in a simple way.</p>
+                        <p>Two people…<br>
+                        figuring things out slowly,<br>
+                        without pressure, without expectations.</p>
+                        <p>Talking normally.<br>
+                        Laughing at small things.<br>
+                        Being there for each other.</p>
+                        <p class="whisper">Nothing perfect.<br>Just real.</p>
+                    </div>
+                    <div class="page-footer">
+                        <span class="page-num">5</span>
+                    </div>
+                    <button class="page-turn-btn prev-btn" onclick="goPrev()" aria-label="Previous page">←</button>
+                    <button class="page-turn-btn next-btn" onclick="turnPage(6, 'next')" aria-label="Next page">→</button>
+                </div>
+                <div class="page-back"></div>
+            </div>
+
+            <!-- Page 7: Final Chapter -->
+            <div class="page" id="page-7">
+                <div class="page-front chapter-page final-chapter">
+                    <div class="page-header">
+                        <span class="chapter-number">Final Chapter</span>
+                        <span class="chapter-title">The Question</span>
+                    </div>
+                    <div class="page-body">
+                        <p>So here I am…<br>
+                        not trying to make things complicated again.</p>
+                        <p>Just asking something simple.<br>
+                        Not expecting a perfect answer.<br>
+                        Not expecting it immediately.</p>
+                        <p>But honestly.</p>
+                        <p class="the-question">👉 Will you be a part of this story?</p>
+                        <div class="answer-buttons">
+                            <button class="answer-btn yes-btn" id="yesBtn" onclick="showEnding('yes')">💖 Yes</button>
+                            <button class="answer-btn time-btn" id="timeBtn" onclick="showEnding('time')">🙂 I Need Time</button>
+                            <button class="answer-btn no-btn" id="noBtn" onclick="showEnding('no')">💔 No</button>
+                        </div>
+                    </div>
+                    <div class="page-footer">
+                        <span class="page-num">6</span>
+                    </div>
+                    <button class="page-turn-btn prev-btn" onclick="goPrev()" aria-label="Previous page">←</button>
+                </div>
+                <div class="page-back"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Ending Overlays -->
+    <div class="ending-overlay" id="endingYes">
+        <div class="ending-content ending-yes">
+            <div class="ending-particles" id="yesParticles"></div>
+            <div class="ending-icon">💖</div>
+            <h2>If Yes…</h2>
+            <p class="ending-text">I guess this just became<br><em>my favorite story.</em></p>
+            <div class="hearts-rain" id="heartsRain"></div>
+            <button class="back-btn" onclick="closeEnding()">← Back to Book</button>
+        </div>
+    </div>
+
+    <div class="ending-overlay" id="endingTime">
+        <div class="ending-content ending-time">
+            <div class="ending-icon">🙂</div>
+            <h2>If You Need Time…</h2>
+            <p class="ending-text">That's completely okay.<br><em>Good things are worth waiting for.</em></p>
+            <button class="back-btn" onclick="closeEnding()">← Back to Book</button>
+        </div>
+    </div>
+
+    <div class="ending-overlay" id="endingNo">
+        <div class="ending-content ending-no">
+            <div class="ending-icon">💔</div>
+            <h2>If No…</h2>
+            <p class="ending-text">Then this still remains a story<br><em>I'll always be glad I told.</em></p>
+            <button class="back-btn" onclick="closeEnding()">← Back to Book</button>
+        </div>
+    </div>
+
+
+
+
+    <script src="script.js"></script>
+</body>
+</html>
