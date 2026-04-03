@@ -66,9 +66,6 @@ function playPageSound() {
 
 // ------- Background Music -------
 const bgMusic = document.getElementById('bgMusic');
-const musicToggle = document.getElementById('musicToggle');
-const musicIcon = document.getElementById('musicIcon');
-const musicLabel = document.getElementById('musicLabel');
 
 if (bgMusic) {
     bgMusic.volume = 0;
@@ -89,33 +86,10 @@ function fadeInBgm() {
     }, 50);
 }
 
-function toggleBgm() {
-    if (!bgMusic) return;
-    if (bgMusic.paused) {
-        fadeInBgm();
-        musicToggle.classList.add('playing');
-        musicIcon.textContent = '🎶';
-        musicLabel.textContent = 'Pause';
-        bgmStarted = true;
-    } else {
-        bgMusic.pause();
-        musicToggle.classList.remove('playing');
-        musicIcon.textContent = '🎵';
-        musicLabel.textContent = 'Play';
-    }
-}
-
-if (musicToggle) {
-    musicToggle.addEventListener('click', toggleBgm);
-}
-
 // Auto-start music on first page turn
 function tryAutoStartBgm() {
     if (!bgmStarted && bgMusic) {
         fadeInBgm();
-        musicToggle.classList.add('playing');
-        musicIcon.textContent = '🎶';
-        musicLabel.textContent = 'Pause';
         bgmStarted = true;
     }
 }
